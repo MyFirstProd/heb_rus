@@ -1,16 +1,23 @@
-# This is a sample Python script.
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# Загрузка модели и токенизатора без FastTokenizer
+tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-1.3B", use_fast=False)
+model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-1.3B")
 
+# Установка языка источника
+tokenizer.src_lang = "heb"
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# Исходный текст
+hebrew_text = "שלום, איך אתה מרגיש היום?"
+inputs = tokenizer(hebrew_text, return_tensors="pt")
 
+# Перевод (русский — ID 256147, см. tokenizer.json)
+outputs = model.generate(
+    **inputs,
+    forced_bos_token_id=256147,
+    max_length=256
+)
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# Декодирование результата
+translation = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+print("Перевод:", translation)
