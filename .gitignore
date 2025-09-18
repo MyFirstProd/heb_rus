@@ -1,6 +1,0 @@
-model/
-*.safetensors
-*.bin
-*.pt
-*.onnx
-__pycache__/
